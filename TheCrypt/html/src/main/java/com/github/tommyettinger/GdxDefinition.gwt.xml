@@ -4,6 +4,7 @@
   <source path="" />
   <inherits name="com.badlogic.gdx.backends.gdx_backends_gwt" />
   <inherits name="com.github.tommyettinger.DaybreakDemo" />
+  <inherits name="com.github.tommyettinger.cringe" />
   <inherits name="com.github.tommyettinger.digital" />
   <inherits name="com.github.tommyettinger.funderby" />
   <inherits name="com.github.tommyettinger.jdkgdxds" />

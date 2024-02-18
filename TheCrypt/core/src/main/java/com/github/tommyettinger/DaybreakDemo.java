@@ -16,7 +16,11 @@
 
 package com.github.tommyettinger;
 
-import com.badlogic.gdx.*;
+import com.badlogic.gdx.Application;
+import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
@@ -33,6 +37,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.github.tommyettinger.cringe.RandomDistinct64;
 import com.github.tommyettinger.digital.BitConversion;
 import com.github.tommyettinger.digital.TrigTools;
 import com.github.tommyettinger.ds.IntObjectMap;
@@ -41,7 +46,14 @@ import com.github.tommyettinger.ds.ObjectList;
 import com.github.tommyettinger.random.ChopRandom;
 import com.github.yellowstonegames.core.DescriptiveColor;
 import com.github.yellowstonegames.core.FullPalette;
-import com.github.yellowstonegames.grid.*;
+import com.github.yellowstonegames.grid.Coord;
+import com.github.yellowstonegames.grid.CoordObjectOrderedMap;
+import com.github.yellowstonegames.grid.Direction;
+import com.github.yellowstonegames.grid.LineTools;
+import com.github.yellowstonegames.grid.Measurement;
+import com.github.yellowstonegames.grid.Radiance;
+import com.github.yellowstonegames.grid.Region;
+import com.github.yellowstonegames.grid.VisionFramework;
 import com.github.yellowstonegames.path.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
 import com.github.yellowstonegames.smooth.AnimatedGlidingSprite;
@@ -66,6 +78,8 @@ public class DaybreakDemo extends ApplicationAdapter {
 
     // random number generator; this one is more efficient on GWT, but less-so on desktop.
     private ChopRandom rng;
+
+    private final RandomDistinct64 unseededRandom = new RandomDistinct64();
 
     public long seed = 0L;
 
@@ -191,7 +205,7 @@ public class DaybreakDemo extends ApplicationAdapter {
         lastMove = startTime;
         // We just need to have a random number generator.
         // This is seeded the same every time.
-        rng.setSeed(seed);
+        rng.setSeed(12345);
         // Using this would give a different dungeon every time.
 //        rng = new ChopRandom(startTime);
 
@@ -303,7 +317,7 @@ public class DaybreakDemo extends ApplicationAdapter {
             monsters.put(monPos, monster);
             vision.lighting.addLight(monPos, new Radiance(rng.nextFloat(3f) + 2f,
 //                    FullPalette.COLOR_WHEEL_PALETTE_LIGHT[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_LIGHT.length)], 0f, 0f));
-                    FullPalette.COLOR_WHEEL_PALETTE_MID[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_MID.length)], 0.5f, 0f));
+                    FullPalette.COLOR_WHEEL_PALETTE_MID[unseededRandom.nextInt(FullPalette.COLOR_WHEEL_PALETTE_MID.length)], 0.5f, 0f));
         }
 //        monsterDirector = new Director<>((e) -> e.getValue().getLocation(), monsters, 125);
         monsterDirector = new Director<>(c -> monsters.get(c).getLocation(), monsters.order(), 150);
@@ -404,7 +418,6 @@ public class DaybreakDemo extends ApplicationAdapter {
         // Stores all images we use here efficiently, as well as the font image
         atlas = new TextureAtlas(Gdx.files.internal("dawnlike/Dawnlike.atlas"), Gdx.files.internal("dawnlike"));
         font = new BitmapFont(Gdx.files.internal("dawnlike/font.fnt"), atlas.findRegion("font"));
-//        font = new BitmapFont(Gdx.files.internal("dawnlike/PlainAndSimplePlus.fnt"), atlas.findRegion("PlainAndSimplePlus"));
         font.setUseIntegerPositions(false);
         font.getData().setScale(2f / cellWidth, 2f / cellHeight);
         font.getData().markupEnabled = true;

@@ -31,6 +31,7 @@ gwt {
 
 dependencies {
   implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
+  implementation "com.github.tommyettinger:cringe:$cringeVersion:sources"
   implementation "com.github.tommyettinger:digital:$digitalVersion:sources"
   implementation "com.github.tommyettinger:funderby:$funderbyVersion:sources"
   implementation "com.github.tommyettinger:gdx-backend-gwt:1.1210.1"

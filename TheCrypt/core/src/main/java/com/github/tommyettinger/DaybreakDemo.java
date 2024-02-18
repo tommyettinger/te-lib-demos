@@ -37,6 +37,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.github.tommyettinger.cringe.EncryptedFileHandle;
 import com.github.tommyettinger.cringe.RandomDistinct64;
 import com.github.tommyettinger.digital.BitConversion;
 import com.github.tommyettinger.digital.TrigTools;
@@ -416,8 +417,8 @@ public class DaybreakDemo extends ApplicationAdapter {
         nextMovePositions = new ObjectDeque<>(200);
 
         // Stores all images we use here efficiently, as well as the font image
-        atlas = new TextureAtlas(Gdx.files.internal("dawnlike/Dawnlike.atlas"), Gdx.files.internal("dawnlike"));
-        font = new BitmapFont(Gdx.files.internal("dawnlike/font.fnt"), atlas.findRegion("font"));
+        atlas = new TextureAtlas(new EncryptedFileHandle(Gdx.files.internal("dawnlike/Dawnlike.atlas"), 1L, 22L, 333L, 4444L), new EncryptedFileHandle(Gdx.files.internal("dawnlike"), 1L, 22L, 333L, 4444L));
+        font = new BitmapFont(new EncryptedFileHandle(Gdx.files.internal("dawnlike/font.fnt"), 1L, 22L, 333L, 4444L), atlas.findRegion("font"));
         font.setUseIntegerPositions(false);
         font.getData().setScale(2f / cellWidth, 2f / cellHeight);
         font.getData().markupEnabled = true;

@@ -1,3 +1,25 @@
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files
+import com.github.tommyettinger.cringe.EncryptedFileHandle
+
+buildscript {
+  repositories {
+    mavenCentral()
+    maven { url 'https://s01.oss.sonatype.org' }
+    gradlePluginPortal()
+    google()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url 'https://jitpack.io' }
+  }
+  dependencies {
+    classpath "com.github.tommyettinger:cringe:$cringeVersion"
+    classpath "com.badlogicgames.gdx:gdx:$gdxVersion"
+    classpath "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+    classpath "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+  }
+}
+
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 eclipse.project.name = appName + '-core'
 
@@ -15,4 +37,21 @@ dependencies {
   api "com.github.yellowstonegames.squidsquad:SquidPath:$squidSquadVersion"
   api "com.github.yellowstonegames.squidsquad:SquidText:$squidSquadVersion"
   api "com.github.yellowstonegames.squidsquad:SquidSmooth:$squidSquadVersion"
+}
+
+tasks.register('encrypt') {
+  var raw = rootProject.file('_raw_resources_')
+  var assets = rootProject.file('assets')
+  inputs.dir(raw.path)
+  outputs.dir(assets.path)
+  doLast {
+    Gdx.files = new Lwjgl3Files()
+    inputs.files.forEach {
+      var path = raw.relativePath(it)
+      println path
+      var original = Gdx.files.internal(it.path)
+      new EncryptedFileHandle(Gdx.files.absolute(it.absolutePath.replaceFirst("_raw_resources_", "assets")), 1L, 22L,
+              333L, 4444L, path).writeBytes(original.readBytes(), false);
+    }
+  }
 }

@@ -37,6 +37,7 @@ dependencies {
 def jarName = "${appName}-${version}.jar"
 def os = System.properties['os.name'].toLowerCase()
 
+processResources.dependsOn(':core:encrypt')
 run {
   workingDir = rootProject.file('assets').path
   setIgnoreExitValue(true)

@@ -417,22 +417,13 @@ public class DaybreakDemo extends ApplicationAdapter {
         nextMovePositions = new ObjectDeque<>(200);
 
         // Stores all images we use here efficiently, as well as the font image
-        atlas = new TextureAtlas(new EncryptedFileHandle(Gdx.files.internal("dawnlike/Dawnlike.atlas"), 1L, 22L, 333L, 4444L), new EncryptedFileHandle(Gdx.files.internal("dawnlike"), 1L, 22L, 333L, 4444L));
-        font = new BitmapFont(new EncryptedFileHandle(Gdx.files.internal("dawnlike/font.fnt"), 1L, 22L, 333L, 4444L), atlas.findRegion("font"));
+        atlas = new TextureAtlas(new EncryptedFileHandle(Gdx.files.internal("dawnlike/Dawnlike.atlas.dat"), 1L, 22L, 333L, 4444L), new EncryptedFileHandle(Gdx.files.internal("dawnlike"), 1L, 22L, 333L, 4444L));
+        font = new BitmapFont(new EncryptedFileHandle(Gdx.files.internal("dawnlike/font.fnt.dat"), 1L, 22L, 333L, 4444L), atlas.findRegion("font"));
         font.setUseIntegerPositions(false);
         font.getData().setScale(2f / cellWidth, 2f / cellHeight);
         font.getData().markupEnabled = true;
 
         vision.rememberedColor = OKLAB_MEMORY;
-
-//        Pixmap pCursor = new Pixmap(cellWidth, cellHeight, Pixmap.Format.RGBA8888);
-//        Pixmap pAtlas = new Pixmap(Gdx.files.classpath("dawnlike/Dawnlike.png"));
-//        String[] cursorNames = {"broadsword", "dwarvish spear", "javelin", "vulgar polearm", "pole cleaver", "quarterstaff"};
-//        TextureAtlas.AtlasRegion pointer = atlas.findRegion(cursorNames[(int) (TimeUtils.millis() & 0xFFFFF) % cursorNames.length]);
-//        pCursor.drawPixmap(pAtlas, pointer.getRegionX(), pointer.getRegionY(), 16, 16, 0, 0, cellWidth, cellHeight);
-//        Gdx.graphics.setCursor(Gdx.graphics.newCursor(pCursor, 1, 1));
-//        pAtlas.dispose();
-//        pCursor.dispose();
 
         solid = atlas.findRegion("pixel");
         charMapping = new IntObjectMap<>(64);

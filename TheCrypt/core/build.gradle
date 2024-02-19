@@ -44,14 +44,12 @@ tasks.register('encrypt') {
   var assets = rootProject.file('assets')
   inputs.dir(raw.path)
   outputs.dir(assets.path)
-  doLast {
-    Gdx.files = new Lwjgl3Files()
-    inputs.files.forEach {
-      var path = raw.relativePath(it)
-      println path
-      var original = Gdx.files.internal(it.path)
-      new EncryptedFileHandle(Gdx.files.absolute(it.absolutePath.replaceFirst("_raw_resources_", "assets")), 1L, 22L,
-              333L, 4444L, path).writeBytes(original.readBytes(), false);
-    }
+  Gdx.files = new Lwjgl3Files()
+  inputs.files.forEach {
+    var path = raw.relativePath(it)
+    println path
+    var original = Gdx.files.internal(it.path)
+    new EncryptedFileHandle(Gdx.files.absolute(it.absolutePath.replaceFirst("_raw_resources_", "assets") + (it.isDirectory() ? "" : ".dat")), 1L, 22L,
+            333L, 4444L, path + (it.isDirectory() ? "" : ".dat")).writeBytes(original.readBytes(), false);
   }
 }

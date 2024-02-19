@@ -50,6 +50,8 @@ dependencies {
 
 }
 
+processResources.dependsOn(':core:encrypt')
+
 import org.akhikhl.gretty.AppBeforeIntegrationTestTask
 import org.docstr.gradle.plugins.gwt.GwtSuperDev
 

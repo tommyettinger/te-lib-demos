@@ -417,8 +417,8 @@ public class DaybreakDemo extends ApplicationAdapter {
         nextMovePositions = new ObjectDeque<>(200);
 
         // Stores all images we use here efficiently, as well as the font image
-        atlas = new TextureAtlas(new EncryptedFileHandle(Gdx.files.internal("dawnlike/Dawnlike.atlas.dat"), 1L, 22L, 333L, 4444L), new EncryptedFileHandle(Gdx.files.internal("dawnlike"), 1L, 22L, 333L, 4444L));
-        font = new BitmapFont(new EncryptedFileHandle(Gdx.files.internal("dawnlike/font.fnt.dat"), 1L, 22L, 333L, 4444L), atlas.findRegion("font"));
+        atlas = new TextureAtlas(new EncryptedFileHandle(Gdx.files.internal("dawnlike/Dawnlike.atlas"), 1L, 22L, 333L, 4444L), new EncryptedFileHandle(Gdx.files.internal("dawnlike"), 1L, 22L, 333L, 4444L));
+        font = new BitmapFont(new EncryptedFileHandle(Gdx.files.internal("dawnlike/font.fnt"), 1L, 22L, 333L, 4444L), atlas.findRegion("font"));
         font.setUseIntegerPositions(false);
         font.getData().setScale(2f / cellWidth, 2f / cellHeight);
         font.getData().markupEnabled = true;

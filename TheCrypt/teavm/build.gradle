@@ -30,6 +30,8 @@ dependencies {
 
 }
 
+processResources.dependsOn(':core:encrypt')
+
 tasks.register('buildJavaScript', JavaExec) {
   dependsOn classes
   setDescription("Transpile bytecode to JavaScript via TeaVM")

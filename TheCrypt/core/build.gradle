@@ -8,6 +8,7 @@ buildscript {
     maven { url 'https://s01.oss.sonatype.org' }
     gradlePluginPortal()
     google()
+    mavenLocal()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
@@ -47,9 +48,10 @@ tasks.register('encrypt') {
   Gdx.files = new Lwjgl3Files()
   inputs.files.forEach {
     var path = raw.relativePath(it)
-    println path
     var original = Gdx.files.internal(it.path)
-    new EncryptedFileHandle(Gdx.files.absolute(it.absolutePath.replaceFirst("_raw_resources_", "assets") + (it.isDirectory() ? "" : ".dat")), 1L, 22L,
-            333L, 4444L, path + (it.isDirectory() ? "" : ".dat")).writeBytes(original.readBytes(), false);
+    new EncryptedFileHandle(Gdx.files.absolute(it.absolutePath.replaceFirst("_raw_resources_", "assets")), 1L, 22L,
+            333L, 4444L, path).writeBytes(original.readBytes(), false);
+//    new EncryptedFileHandle(Gdx.files.absolute(it.absolutePath.replaceFirst("_raw_resources_", "assets") + (it.isDirectory() ? "" : ".dat")), 1L, 22L,
+//            333L, 4444L, path + (it.isDirectory() ? "" : ".dat")).writeBytes(original.readBytes(), false);
   }
 }

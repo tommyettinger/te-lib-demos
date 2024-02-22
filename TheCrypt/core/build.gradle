@@ -1,6 +1,7 @@
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files
 import com.github.tommyettinger.cringe.EncryptedFileHandle
+import com.github.tommyettinger.cringe.Scramblers
 
 buildscript {
   repositories {
@@ -49,9 +50,10 @@ tasks.register('encrypt') {
   inputs.files.forEach {
     var path = raw.relativePath(it)
     var original = Gdx.files.internal(it.path)
-    new EncryptedFileHandle(Gdx.files.absolute(it.absolutePath.replaceFirst("_raw_resources_", "assets")), 1L, 22L,
-            333L, 4444L, path).writeBytes(original.readBytes(), false);
-//    new EncryptedFileHandle(Gdx.files.absolute(it.absolutePath.replaceFirst("_raw_resources_", "assets") + (it.isDirectory() ? "" : ".dat")), 1L, 22L,
-//            333L, 4444L, path + (it.isDirectory() ? "" : ".dat")).writeBytes(original.readBytes(), false);
+    new EncryptedFileHandle(Gdx.files.absolute(it.absolutePath.replaceFirst("_raw_resources_", "assets")),
+            1L, 22L, 333L, 4444L,
+            path).writeBytes(original.readBytes(), false);
   }
 }
+//    new EncryptedFileHandle(Gdx.files.absolute(it.absolutePath.replaceFirst("_raw_resources_", "assets") + (it.isDirectory() ? "" : ".dat")),
+//            1L, 22L, 333L, 4444L, path + (it.isDirectory() ? "" : ".dat")).writeBytes(original.readBytes(), false);

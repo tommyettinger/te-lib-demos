@@ -69,6 +69,8 @@ dependencies {
 
 }
 
+
+
 // Called every time gradle gets executed, takes the native dependencies of
 // the natives configuration, and extracts them to the proper libs/ folders
 // so they get packed with the APK.
@@ -94,6 +96,10 @@ tasks.register('copyAndroidNatives') {
       }
     }
   }
+}
+
+tasks.matching { it.name.contains("Assets") || it.name.contains("lint") }.configureEach { packageTask ->
+  packageTask.dependsOn ':core:encrypt'
 }
 
 tasks.matching { it.name.contains("merge") && it.name.contains("JniLibFolders") }.configureEach { packageTask ->

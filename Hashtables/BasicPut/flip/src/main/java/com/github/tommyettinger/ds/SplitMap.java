@@ -246,8 +246,8 @@ public class SplitMap<K, V> implements Map<K, V> {
 
 		final int hc = key.hashCode();
 
-		return key == keyTable[(int)(hashMultiplier1 * hc >>> shift) | 1] ||
-			key == keyTable[(int)(hashMultiplier2 * hc >>> shift) & -2];
+		return key.equals(keyTable[(int)(hashMultiplier1 * hc >>> shift) | 1]) ||
+			key.equals(keyTable[(int)(hashMultiplier2 * hc >>> shift) & -2]);
 	}
 
 
@@ -276,11 +276,11 @@ public class SplitMap<K, V> implements Map<K, V> {
 
 		int hc = key.hashCode();
 		int hr1 = (int)(hashMultiplier1 * hc >>> shift) | 1;
-		if (key == keyTable[hr1])
+		if (key.equals(keyTable[hr1]))
 			return valueTable[hr1];
 
 		int hr2 = (int)(hashMultiplier2 * hc >>> shift) & -2;
-		if (key == keyTable[hr2])
+		if (key.equals(keyTable[hr2]))
 			return valueTable[hr2];
 
 		return defaultValue;
@@ -310,12 +310,12 @@ public class SplitMap<K, V> implements Map<K, V> {
 		V old = defaultValue;
 		int hc = key.hashCode();
 		int hr1 = (int)(hashMultiplier1 * hc >>> shift) | 1;
-		if (key == keyTable[hr1]) {
+		if (key.equals(keyTable[hr1])) {
 			old = valueTable[hr1];
 			absent = false;
 		} else {
 			int hr2 = (int)(hashMultiplier2 * hc >>> shift) & -2;
-			if (key == keyTable[hr2]) {
+			if (key.equals(keyTable[hr2])) {
 				old = valueTable[hr2];
 				absent = false;
 			}
@@ -360,13 +360,13 @@ public class SplitMap<K, V> implements Map<K, V> {
 			int hc = key.hashCode();
 			int hr1 = (int)(hashMultiplier1 * hc >>> shift) | 1;
 			K k1 = keyTable[hr1];
-			if (k1 == null || key == k1) {
+			if (k1 == null || key.equals(k1)) {
 				valueTable[hr1] = value;
 				return null;
 			}
 			int hr2 = (int)(hashMultiplier2 * hc >>> shift) & -2;
 			K k2 = keyTable[hr2];
-			if (k2 == null || key == k2) {
+			if (k2 == null || key.equals(k2)) {
 				valueTable[hr2] = value;
 				return null;
 			}
@@ -395,13 +395,13 @@ public class SplitMap<K, V> implements Map<K, V> {
 			int hc = key.hashCode();
 			int hr1 = (int)(hashMultiplier1 * hc >>> shift) | 1;
 			K k1 = keyTable[hr1];
-			if (k1 == null || key == k1) {
+			if (k1 == null || key.equals(k1)) {
 				valueTable[hr1] = value;
 				return false;
 			}
 			int hr2 = (int)(hashMultiplier2 * hc >>> shift) & -2;
 			K k2 = keyTable[hr2];
-			if (k2 == null || key == k2) {
+			if (k2 == null || key.equals(k2)) {
 				valueTable[hr2] = value;
 				return false;
 			}
@@ -452,14 +452,14 @@ public class SplitMap<K, V> implements Map<K, V> {
 		int hr1 = (int)(hashMultiplier1 * hc >>> shift) | 1;
 		V oldValue = null;
 
-		if (key == keyTable[hr1]) {
+		if (key.equals(keyTable[hr1])) {
 			oldValue = valueTable[hr1];
 			keyTable[hr1] = null;
 			valueTable[hr1] = null;
 			size--;
 		} else {
 			int hr2 = (int)(hashMultiplier2 * hc >>> shift) & -2;
-			if (key == keyTable[hr2]) {
+			if (key.equals(keyTable[hr2])) {
 				oldValue = valueTable[hr2];
 				keyTable[hr2] = null;
 				valueTable[hr2] = null;
@@ -905,7 +905,7 @@ public class SplitMap<K, V> implements Map<K, V> {
 			int hc = key.hashCode(), shift = map.shift;
 			int hr1 = (int)(hashMultiplier1 * hc >>> shift) | 1;
 
-			if (key == keyTable[hr1]) {
+			if (key.equals(keyTable[hr1])) {
 				keyTable[hr1] = null;
 				valueTable[hr1] = null;
 				map.size--;
@@ -914,7 +914,7 @@ public class SplitMap<K, V> implements Map<K, V> {
 
 			} else {
 				int hr2 = (int)(hashMultiplier2 * hc >>> shift) & -2;
-				if (key == keyTable[hr2]) {
+				if (key.equals(keyTable[hr2])) {
 					keyTable[hr2] = null;
 					valueTable[hr2] = null;
 					map.size--;

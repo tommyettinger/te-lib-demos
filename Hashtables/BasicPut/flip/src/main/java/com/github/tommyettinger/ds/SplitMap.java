@@ -134,12 +134,6 @@ public class SplitMap<K, V> implements Map<K, V> {
 	protected V defaultValue = null;
 
 	/**
-	 * Only used by {@link #putSafe(Object, Object)} to transfer a value along with the key it returns.
-	 * Can typically be ignored.
-	 */
-	protected transient V displacedValue;
-
-	/**
 	 * Holds a cached {@link #entrySet()}.
 	 */
 	@Nullable
@@ -350,11 +344,11 @@ public class SplitMap<K, V> implements Map<K, V> {
 	}
 
 	/**
-	 * Attempts to place the given key and value, but is permitted to fail. If this fails, it returns a displaced key
-	 * and assigns its displaced value to {@link #displacedValue}.
-	 * @return the key we failed to move because of collisions or {@code null} if successful.
+	 * Attempts to place the given key and value, but is permitted to fail. If this fails, it returns true,
+	 * and expects the caller to understand that a key was not placed where it should be.
+	 * @return true if there was a failure at some point, or false if nothing went wrong
 	 */
-	protected K putSafe (K key, V value) {
+	protected boolean putSafe (K key, V value) {
 		int loop = 0;
 		while (loop++ < flipThreshold) {
 			int hc = key.hashCode();
@@ -362,13 +356,13 @@ public class SplitMap<K, V> implements Map<K, V> {
 			K k1 = keyTable[hr1];
 			if (k1 == null || key.equals(k1)) {
 				valueTable[hr1] = value;
-				return null;
+				return false;
 			}
 			int hr2 = (int)(hashMultiplier2 * hc >>> shift) & -2;
 			K k2 = keyTable[hr2];
 			if (k2 == null || key.equals(k2)) {
 				valueTable[hr2] = value;
-				return null;
+				return false;
 			}
 
 			// Both tables have an item in the required position that doesn't have the same key, we need to move things around.
@@ -379,8 +373,7 @@ public class SplitMap<K, V> implements Map<K, V> {
 			valueTable[hr1] = value;
 			value = temp;
 		}
-		displacedValue = value;
-		return key;
+		return true;
 	}
 
 	/**
@@ -425,28 +418,8 @@ public class SplitMap<K, V> implements Map<K, V> {
 		if (key == null)
 			return null;
 
-		if(flipThreshold == 0) {
-			int i = locateKey(key);
-			if (i < 0) {return defaultValue;}
-			K[] keyTable = this.keyTable;
-			V[] valueTable = this.valueTable;
-			K rem;
-			V oldValue = valueTable[i];
-			int mask = this.mask, next = i + 1 & mask;
-			while ((rem = keyTable[next]) != null) {
-				int placement = (int)(rem.hashCode() * hashMultiplier1 >>> shift);
-				if ((next - placement & mask) > (i - placement & mask)) {
-					keyTable[i] = rem;
-					valueTable[i] = valueTable[next];
-					i = next;
-				}
-				next = next + 1 & mask;
-			}
-			keyTable[i] = null;
-			valueTable[i] = null;
-			size--;
-			return oldValue;
-		}
+		if(flipThreshold == 0)
+			return removeLinear(key);
 
 		int hc = key.hashCode();
 		int hr1 = (int)(hashMultiplier1 * hc >>> shift) | 1;
@@ -467,6 +440,29 @@ public class SplitMap<K, V> implements Map<K, V> {
 			}
 		}
 
+		return oldValue;
+	}
+
+	protected V removeLinear(@NonNull Object key) {
+		int i = locateKey(key);
+		if (i < 0) return defaultValue;
+		K[] keyTable = this.keyTable;
+		V[] valueTable = this.valueTable;
+		K rem;
+		V oldValue = valueTable[i];
+		int mask = this.mask, next = i + 1 & mask;
+		while ((rem = keyTable[next]) != null) {
+			int placement = (int)(rem.hashCode() * hashMultiplier1 >>> shift);
+			if ((next - placement & mask) > (i - placement & mask)) {
+				keyTable[i] = rem;
+				valueTable[i] = valueTable[next];
+				i = next;
+			}
+			next = next + 1 & mask;
+		}
+		keyTable[i] = null;
+		valueTable[i] = null;
+		size--;
 		return oldValue;
 	}
 
@@ -532,25 +528,7 @@ public class SplitMap<K, V> implements Map<K, V> {
 	protected boolean resize(final int newSize) {
 		if(size == 0) return true;
 		if(flipThreshold == 0) {
-			int oldCapacity = keyTable.length;
-			loadThreshold = (int)(newSize * loadFactor);
-			mask = newSize - 1;
-			shift = BitConversion.countLeadingZeros(newSize - 1L);
-
-			hashMultiplier1 = Utilities.GOOD_MULTIPLIERS[(int)(hashMultiplier1 >>> 48 + shift) & 511];
-			K[] oldKeyTable = keyTable;
-			V[] oldValueTable = valueTable;
-
-			keyTable = (K[])new Object[newSize];
-			valueTable = (V[])new Object[newSize];
-
-			if (size > 0) {
-				for (int i = 0; i < oldCapacity; i++) {
-					K key = oldKeyTable[i];
-					if (key != null) {
-						putResizeLinear(key, oldValueTable[i]);}
-				}
-			}
+			resizeLinear(newSize);
 			return true;
 		}
 
@@ -572,9 +550,8 @@ public class SplitMap<K, V> implements Map<K, V> {
 
 		for (int i = 0; i < oldK.length; i++) {
 			if (oldK[i] != null) {
-				if (putSafe(oldK[i], oldV[i]) != null) {
+				if (putSafe(oldK[i], oldV[i])) {
 					// Placing the old key failed for any reason.
-					displacedValue = null;
 					keyTable = oldK;
 					valueTable = oldV;
 					hashMultiplier1 = oldH1;
@@ -589,6 +566,29 @@ public class SplitMap<K, V> implements Map<K, V> {
 		}
 
 		return true;
+	}
+
+	@SuppressWarnings("unchecked")
+	private void resizeLinear(int newSize) {
+		int oldCapacity = keyTable.length;
+		loadThreshold = (int)(newSize * loadFactor);
+		mask = newSize - 1;
+		shift = BitConversion.countLeadingZeros(newSize - 1L);
+
+		hashMultiplier1 = Utilities.GOOD_MULTIPLIERS[(int)(hashMultiplier1 >>> 48 + shift) & 511];
+		K[] oldKeyTable = keyTable;
+		V[] oldValueTable = valueTable;
+
+		keyTable = (K[])new Object[newSize];
+		valueTable = (V[])new Object[newSize];
+
+		if (size > 0) {
+			for (int i = 0; i < oldCapacity; i++) {
+				K key = oldKeyTable[i];
+				if (key != null) {
+					putResizeLinear(key, oldValueTable[i]);}
+			}
+		}
 	}
 
 	/**
@@ -881,23 +881,7 @@ public class SplitMap<K, V> implements Map<K, V> {
 			V[] valueTable = map.valueTable;
 
 			if(map.flipThreshold == 0) {
-				final long hashMultiplier1 = map.hashMultiplier1;
-				K rem;
-				int mask = map.mask, next = i + 1 & mask, shift = map.shift;
-				while ((rem = keyTable[next]) != null) {
-					int placement = (int)(rem.hashCode() * hashMultiplier1 >>> shift);
-					if ((next - placement & mask) > (i - placement & mask)) {
-						keyTable[i] = rem;
-						valueTable[i] = valueTable[next];
-						i = next;
-					}
-					next = next + 1 & mask;
-				}
-				keyTable[i] = null;
-				valueTable[i] = null;
-				map.size--;
-				if (i != currentIndex) {--nextIndex;}
-				currentIndex = -1;
+				removeLinear(i, keyTable, valueTable);
 				return;
 			}
 			K key = keyTable[i];
@@ -922,6 +906,27 @@ public class SplitMap<K, V> implements Map<K, V> {
 					currentIndex = -1;
 				}
 			}
+		}
+
+		private void removeLinear(int i, final K[] keyTable, final V[] valueTable) {
+			final long hashMultiplier1 = map.hashMultiplier1;
+			K rem;
+			int mask = map.mask, next = i + 1 & mask, shift = map.shift;
+			while ((rem = keyTable[next]) != null) {
+				int placement = (int)(rem.hashCode() * hashMultiplier1 >>> shift);
+				if ((next - placement & mask) > (i - placement & mask)) {
+					keyTable[i] = rem;
+					valueTable[i] = valueTable[next];
+					i = next;
+				}
+				next = next + 1 & mask;
+			}
+			keyTable[i] = null;
+			valueTable[i] = null;
+			map.size--;
+			if (i != currentIndex) {--nextIndex;}
+			currentIndex = -1;
+
 		}
 
 		/**

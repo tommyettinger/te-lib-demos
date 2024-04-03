@@ -73,7 +73,7 @@ import java.util.*;
  * @param <K> the type of keys maintained by this map
  * @param <V> the type of mapped values
  */
-public class SplitMap<K, V> implements Map<K, V> {
+public class FlipMap<K, V> implements Map<K, V> {
 
 	protected static final int DEFAULT_START_SIZE = 16;
 	protected static final float DEFAULT_LOAD_FACTOR = 0.45f;
@@ -152,26 +152,26 @@ public class SplitMap<K, V> implements Map<K, V> {
 	protected transient Collection<V> values;
 
 	/**
-	 * Constructs an empty {@code ObjectObjectMap} with the default initial capacity (16)
+	 * Constructs an empty {@code FlipMap} with the default initial capacity (16)
 	 * and the default load factor of {@code 0.45}.
 	 */
-	public SplitMap() {
+	public FlipMap() {
 		this(DEFAULT_START_SIZE, DEFAULT_LOAD_FACTOR);
 	}
 
 	/**
-	 * Constructs an empty {@code ObjectObjectMap} with the specified initial capacity
+	 * Constructs an empty {@code FlipMap} with the specified initial capacity
 	 * and the default load factor of {@code 0.45}.
 	 * The given capacity will be rounded to the nearest power of two.
 	 *
 	 * @param initialCapacity the initial capacity
 	 */
-	public SplitMap(int initialCapacity) {
+	public FlipMap(int initialCapacity) {
 		this(initialCapacity, DEFAULT_LOAD_FACTOR);
 	}
 
 	/**
-	 * Constructs an empty {@code ObjectObjectMap} with the specified load factor and an initial
+	 * Constructs an empty {@code FlipMap} with the specified load factor and an initial
 	 * capacity of 16.
 	 * <p>
 	 * The load factor will cause the map to double in size when the number
@@ -180,12 +180,12 @@ public class SplitMap<K, V> implements Map<K, V> {
 	 *
 	 * @param loadFactor the load factor
 	 */
-	public SplitMap(float loadFactor) {
+	public FlipMap(float loadFactor) {
 		this(DEFAULT_START_SIZE, loadFactor);
 	}
 
 	/**
-	 * Constructs an empty {@code ObjectObjectMap} with the specified load factor and initial
+	 * Constructs an empty {@code FlipMap} with the specified load factor and initial
 	 * capacity.
 	 * <p>
 	 * The load factor will cause the map to double in size when the number
@@ -196,7 +196,7 @@ public class SplitMap<K, V> implements Map<K, V> {
 	 * @param loadFactor the load factor
 	 */
 	@SuppressWarnings("unchecked")
-	public SplitMap(int initialCapacity, float loadFactor) {
+	public FlipMap(int initialCapacity, float loadFactor) {
 		if (initialCapacity <= 0) {
 			throw new IllegalArgumentException("initial capacity must be strictly positive");
 		}
@@ -218,7 +218,7 @@ public class SplitMap<K, V> implements Map<K, V> {
 		regenHashMultipliers(tableSize);
 	}
 
-	public SplitMap(SplitMap<? extends K, ? extends V> other) {
+	public FlipMap(FlipMap<? extends K, ? extends V> other) {
 		size = other.size;
 		mask = other.mask;
 		shift = other.shift;
@@ -295,7 +295,7 @@ public class SplitMap<K, V> implements Map<K, V> {
 	@Override
 	@Nullable
 	public V put (K key, @Nullable V value) {
-		if(key == null) throw new NullPointerException("ObjectObjectMap does not permit null keys.");
+		if(key == null) throw new NullPointerException("FlipMap does not permit null keys.");
 
 		if(flipThreshold == 0)
 			return putLinear(key, value);
@@ -798,8 +798,8 @@ public class SplitMap<K, V> implements Map<K, V> {
 	 */
 	public static class EntrySet<K, V> extends AbstractSet<Map.Entry<K, V>> {
 
-		protected final SplitMap<K, V> map;
-		public EntrySet(SplitMap<K, V> map) {
+		protected final FlipMap<K, V> map;
+		public EntrySet(FlipMap<K, V> map) {
 			this.map = map;
 		}
 		/**
@@ -822,12 +822,12 @@ public class SplitMap<K, V> implements Map<K, V> {
 	public static class EntryIterator<K, V> implements Iterable<Map.Entry<K, V>>, Iterator<Map.Entry<K, V>> {
 		public boolean hasNext;
 
-		protected final SplitMap<K, V> map;
+		protected final FlipMap<K, V> map;
 		protected final Entry<K, V> entry;
 		protected int nextIndex, currentIndex;
 		public boolean valid = true;
 
-		public EntryIterator(SplitMap<K, V> map) {
+		public EntryIterator(FlipMap<K, V> map) {
 			this.map = map;
 			entry = new Entry<>();
 			reset();
@@ -941,8 +941,8 @@ public class SplitMap<K, V> implements Map<K, V> {
 	}
 
 	public static class KeySet<K> extends AbstractSet<K> {
-		SplitMap<K, ?> map;
-		public KeySet(SplitMap<K, ?> map) {
+		FlipMap<K, ?> map;
+		public KeySet(FlipMap<K, ?> map) {
 			this.map = map;
 		}
 
@@ -978,8 +978,8 @@ public class SplitMap<K, V> implements Map<K, V> {
 
 
 	public static class ValueCollection<V> extends AbstractCollection<V> {
-		SplitMap<?, V> map;
-		public ValueCollection(SplitMap<?, V> map) {
+		FlipMap<?, V> map;
+		public ValueCollection(FlipMap<?, V> map) {
 			this.map = map;
 		}
 
@@ -1017,7 +1017,7 @@ public class SplitMap<K, V> implements Map<K, V> {
 	protected static class KeyIterator<K> implements Iterable<K>, Iterator<K> {
 		protected final Iterator<? extends Map.Entry<K, ?>> iter;
 
-		public KeyIterator(SplitMap<K, ?> map) {
+		public KeyIterator(FlipMap<K, ?> map) {
 			iter = map.entrySet().iterator();
 		}
 
@@ -1046,7 +1046,7 @@ public class SplitMap<K, V> implements Map<K, V> {
 	protected static class ValueIterator<V> implements Iterator<V>, Iterable<V> {
 		protected final Iterator<? extends Map.Entry<?, V>> iter;
 
-		public ValueIterator(SplitMap<?, V> map) {
+		public ValueIterator(FlipMap<?, V> map) {
 			iter = map.entrySet().iterator();
 		}
 

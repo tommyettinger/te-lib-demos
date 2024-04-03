@@ -1,14 +1,13 @@
 package com.github.tommyettinger.headless;
 
 import com.badlogic.gdx.math.GridPoint2;
-import com.github.tommyettinger.ds.ObjectObjectMap;
-import com.github.tommyettinger.ds.SplitMap;
+import com.github.tommyettinger.ds.FlipMap;
 
 /** Launches the headless application. */
 public class HeadlessLauncher {
     public static void main(String[] args) {
         final long startTimeNanos = System.nanoTime();
-        SplitMap<GridPoint2, Integer> points = new SplitMap<>(256, 0.45f);
+        FlipMap<GridPoint2, Integer> points = new FlipMap<>(256, 0.45f);
         final long constructionTimeNanos = System.nanoTime();
         for (int x = 0; x < 3000; x++) {
             for (int y = 0; y < 3000; y++) {

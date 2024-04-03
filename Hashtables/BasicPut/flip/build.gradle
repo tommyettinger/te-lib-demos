@@ -16,6 +16,8 @@ dependencies {
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 
   //implementation "org.furyio:fury-core:$furyVersion"
+
+  testImplementation "junit:junit:4.13.2"
 }
 
 jar {

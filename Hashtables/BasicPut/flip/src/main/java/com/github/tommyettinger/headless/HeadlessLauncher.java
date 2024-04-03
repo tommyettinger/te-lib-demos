@@ -7,10 +7,10 @@ import com.github.tommyettinger.ds.ObjectObjectMap;
 public class HeadlessLauncher {
     public static void main(String[] args) {
         final long startTimeNanos = System.nanoTime();
-        ObjectObjectMap<GridPoint2, Integer> points = new ObjectObjectMap<>(100000000, 0.45f);
+        ObjectObjectMap<GridPoint2, Integer> points = new ObjectObjectMap<>(256, 0.45f);
         final long constructionTimeNanos = System.nanoTime();
-        for (int x = 0; x < 10000; x++) {
-            for (int y = 0; y < 10000; y++) {
+        for (int x = 0; x < 3000; x++) {
+            for (int y = 0; y < 3000; y++) {
                 points.put(new GridPoint2(x, y), x - y);
             }
         }

@@ -54,7 +54,7 @@ configure(subprojects) {
 
 subprojects {
   version = '1.0.0'
-  ext.appName = 'BasicFlipPut'
+  ext.appName = 'BasicPut'
   repositories {
     mavenCentral()
     maven { url 'https://s01.oss.sonatype.org' }
@@ -66,4 +66,4 @@ subprojects {
   }
 }
 
-eclipse.project.name = 'BasicFlipPut' + '-parent'
+eclipse.project.name = 'BasicPut' + '-parent'

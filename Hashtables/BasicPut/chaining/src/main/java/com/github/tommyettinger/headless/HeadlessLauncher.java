@@ -8,10 +8,10 @@ import java.util.HashMap;
 public class HeadlessLauncher {
     public static void main(String[] args) {
         final long startTimeNanos = System.nanoTime();
-        HashMap<GridPoint2, Integer> points = new HashMap<>(100000000, 0.67f);
+        HashMap<GridPoint2, Integer> points = new HashMap<>(256, 0.67f);
         final long constructionTimeNanos = System.nanoTime();
-        for (int x = 0; x < 10000; x++) {
-            for (int y = 0; y < 10000; y++) {
+        for (int x = 0; x < 3000; x++) {
+            for (int y = 0; y < 3000; y++) {
                 points.put(new GridPoint2(x, y), x - y);
             }
         }
